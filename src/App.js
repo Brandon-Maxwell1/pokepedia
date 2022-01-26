@@ -3,14 +3,16 @@ import { Routes, Route } from 'react-router-dom'
 // Components
 import Nav from './components/Nav';
 // Pages
+import Home from './pages/Home';
 import Login from './pages/Login';
+import PokemonList from './pages/PokemonList';
 // Contexts
 import UserContext from './contexts/UserContext';
 // CSS
 import './App.css';
 
 
-function App() {
+const App = () => {
   // const user = useContext(UserContext)
   // console.log(user)
 
@@ -25,7 +27,11 @@ function App() {
         <Nav />
 
         <Routes>
+          <Route path='/' element={<Home />} />
           <Route path='login' element={<Login setUser={setUser}/>} />
+          <Route path='pokemon/list' element={<PokemonList />} />
+          {/* <Route path='favorites' element={<Favorites />} /> */}
+          
         </Routes>
 
 

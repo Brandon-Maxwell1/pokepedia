@@ -1,10 +1,12 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import './styles.css'
 
 
 
 const Login = ({ setUser }) => {
     const [username, setUsername] = useState('')
+    const navigate = useNavigate()
     
     const handleChange = e => {
         setUsername(e.target.value)
@@ -13,6 +15,9 @@ const Login = ({ setUser }) => {
     const handleSubmit = e => {
         e.preventDefault()
         setUser(username)
+
+        // We 
+        navigate('/pokemon/list')
     }
 
 // console.log('props', setUser())
