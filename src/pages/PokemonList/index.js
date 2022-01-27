@@ -1,51 +1,77 @@
 import { useEffect, useState } from 'react';
-import ReactPaginate from 'react-paginate';
-import axios from 'axios';
+import ReactPaginate from 'react-paginate'
+import axios from 'axios'
+import './styles.css'
 
 const PokemonList = ({ pokeList, itemsPerPage }) => {
-    console.log('props', pokeList)
-
-    // const pokeBall = pokeList.map(pokemon => <li>{pokemon.name}</li>)
-
+    // console.log('props', pokeList)
     // We start with an empty list of pokeList.
-    const [currentPokemon, SetCurrentPokemon] = useState(null);
+    const [currentPokemon, setCurrentPokemon] = useState([]);
     const [pageCount, setPageCount] = useState(0);
     // Here we use item offsets; we could also use page offsets
     // following the API or data you're working with.
     const [itemOffset, setItemOffset] = useState(0);
 
     useEffect(() => {
-        // Fetch pokeList from another resources.
-        const endOffset = itemOffset + itemsPerPage;
-        console.log(`Loading pokeList from ${itemOffset} to ${endOffset}`);
-        SetCurrentPokemon(pokeList.slice(itemOffset, endOffset));
-        
-        // Need to make a conditional so our currPagePokemon doesn't get invoked we ave data to work with
-        if(currentPokemon) currPagePokemon();
+        try {
+            // Fetch pokeList from another resources.
+            const endOffset = itemOffset + itemsPerPage;
+            console.log(`Loading pokeList from ${itemOffset} to ${endOffset}`);
 
-        setPageCount(Math.ceil(pokeList.length / itemsPerPage));
+            const pokeURLs = []
+
+            for (let i = itemOffset + 1; i <= endOffset; i++) {
+                pokeURLs.push(`https://pokeapi.co/api/v2/pokemon/${i}`)
+            }
+
+            // console.log('urls', pokeURLs)
+            currPagePokemon(pokeURLs)
+            const length = pokeList.length ? pokeList.length : 1118
+            // setCurrentPokemon(pokeList.slice(itemOffset, endOffset));
+            // if(currentPokemon) currPagePokemon()
+            setPageCount(Math.ceil(pokeList.length / itemsPerPage));
+        } catch (error) {
+            console.log(error)
+        }
     }, [itemOffset, itemsPerPage]);
 
-    const currPagePokemon = () => {        
-        currentPokemon.forEach( async (pokemon) => {
-            try{
-                
-            } catch (error) {
-            console.log(pokemon.url)
-            }
-        })
+    const currPagePokemon = (pokeURLs) => {
+        try {
+            // axios all() makes all concurrent requests
+            // instead of doing individuals req, we can programtically make multiple req
+            // If one of our Promises fails, the entire request fails
+            const pokeArr = []
+            axios.all(pokeURLs.map(async (url) => {
+                const response = await axios.get(url)
+                console.log(response.data)
+                pokeArr.push(response.data)
+                setCurrentPokemon(pokeArr.flat())
+                // setCurrentPokemon(...currentPokemon, response.data)
+            }))
+
+            console.log('POKE ARRAY', pokeArr)
+        } catch (error) {
+
+        }
     }
 
     const Pokemon = () => {
         return (
-            <>
-                {pokeList &&
-                    pokeList.map((pokemon) => (
-                        <div>
-                            <h3>{pokemon.name}</h3>
+            <div id="pokemon-container">
+                {
+                    currentPokemon &&
+                    currentPokemon.map(pokemon => (
+                        <div className="card poke-card" key={pokemon.id}>
+                            <img src={pokemon.sprites.front_default} className="card-img-top" alt="..." />
+                                <div className="card-body">
+                                    <h5 className="card-title">{pokemon.name}</h5>
+                                    <p className="card-text">Order: {pokemon.id}</p>
+                                    <a href="#" className="btn btn-primary">Go somewhere</a>
+                                </div>
                         </div>
-                    ))}
-            </>
+                    ))
+                }
+            </div>
         );
     }
 
@@ -62,9 +88,6 @@ const PokemonList = ({ pokeList, itemsPerPage }) => {
 
     return (
         <div>
-            {/* Pokemon List:
-            {pokeBall} */}
-
             <Pokemon />
             <ReactPaginate
                 nextLabel="next >"
@@ -84,10 +107,10 @@ const PokemonList = ({ pokeList, itemsPerPage }) => {
                 breakLinkClassName="page-link"
                 containerClassName="pagination"
                 activeClassName="active"
-                renderOnZeroPageCount={null}
+            // renderOnZeroPageCount={null}
             />
         </div>
-    );
+    )
 }
 
 export default PokemonList;
