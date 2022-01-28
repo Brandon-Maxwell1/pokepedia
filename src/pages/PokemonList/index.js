@@ -3,7 +3,7 @@ import ReactPaginate from 'react-paginate'
 import axios from 'axios'
 import './styles.css'
 
-const PokemonList = ({ pokeList, itemsPerPage }) => {
+const PokemonList = ({ pokeList, itemsPerPage, addToFavorites }) => {
     // console.log('props', pokeList)
     // We start with an empty list of pokeList.
     const [currentPokemon, setCurrentPokemon] = useState([]);
@@ -20,16 +20,22 @@ const PokemonList = ({ pokeList, itemsPerPage }) => {
 
             const pokeURLs = []
 
-            for (let i = itemOffset + 1; i <= endOffset; i++) {
-                pokeURLs.push(`https://pokeapi.co/api/v2/pokemon/${i}`)
+            for (let i = itemOffset; i < endOffset; i++) {
+                if (i < 898) {
+                    pokeURLs.push(`https://pokeapi.co/api/v2/pokemon/${i + 1}`)
+                }
+                else {
+                    pokeURLs.push(`https://pokeapi.co/api/v2/pokemon/${i + 9102}`)
+                }
             }
+
 
             // console.log('urls', pokeURLs)
             currPagePokemon(pokeURLs)
             const length = pokeList.length ? pokeList.length : 1118
             // setCurrentPokemon(pokeList.slice(itemOffset, endOffset));
             // if(currentPokemon) currPagePokemon()
-            setPageCount(Math.ceil(pokeList.length / itemsPerPage));
+            setPageCount(Math.ceil(length / itemsPerPage));
         } catch (error) {
             console.log(error)
         }
@@ -55,7 +61,7 @@ const PokemonList = ({ pokeList, itemsPerPage }) => {
         }
     }
 
-    const Pokemon = () => {
+    const Pokemon = () => {      
         return (
             <div id="pokemon-container">
                 {
@@ -63,11 +69,12 @@ const PokemonList = ({ pokeList, itemsPerPage }) => {
                     currentPokemon.map(pokemon => (
                         <div className="card poke-card" key={pokemon.id}>
                             <img src={pokemon.sprites.front_default} className="card-img-top" alt="..." />
-                                <div className="card-body">
-                                    <h5 className="card-title">{pokemon.name}</h5>
-                                    <p className="card-text">Order: {pokemon.id}</p>
-                                    <a href="#" className="btn btn-primary">Go somewhere</a>
-                                </div>
+                            <div className="card-body">
+                                <h5 className="card-title">{pokemon.name}</h5>
+                                <p className="card-text">Order: {pokemon.id}</p>
+                                <button className='btn btn-danger' onClick={() => addToFavorites(pokemon)}>Like</button>
+                                <a href="#" className="btn btn-primary">Go somewhere</a>
+                            </div>
                         </div>
                     ))
                 }

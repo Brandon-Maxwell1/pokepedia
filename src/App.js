@@ -7,6 +7,7 @@ import Nav from './components/Nav';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import PokemonList from './pages/PokemonList';
+import Favorites from './pages/Favorites';
 // Contexts
 import UserContext from './contexts/UserContext';
 // CSS
@@ -19,6 +20,7 @@ const App = () => {
 
   const [user, setUser] = useState('')
   const [pokeList, setPokeList] = useState([])
+  const [favorites, setFavorites] = useState([])
 
   
 
@@ -36,7 +38,17 @@ const App = () => {
       console.log(error)
     }
   }
-console.log('pokeList', pokeList)
+
+
+  const addToFavorites = (pokemon) => {
+
+    // When we click like inside Pokemon List, send clicked Pokemon back to App
+    // Trigger this function to update our state
+    // App will then pass our state as props to Favorites
+    console.log('we added', pokemon)
+    setFavorites([...favorites, pokemon])
+  }
+// console.log('pokeList', pokeList)
   
   return (
     <div className="App">
@@ -49,11 +61,15 @@ console.log('pokeList', pokeList)
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='login' element={<Login setUser={setUser}/>} />
-          <Route path='pokemon/list' element={<PokemonList pokeList={pokeList} itemsPerPage={8}/>} />
+          <Route path='pokemon/list' element={
+          <PokemonList pokeList={pokeList}
+           itemsPerPage={8}
+           addToFavorites={addToFavorites}
+           />} />
 
           {/* can also pass like {...pokeList} */}
           
-          
+          <Route path='favorites' element={<Favorites favorites={favorites}/>} />
         </Routes>
 
 
